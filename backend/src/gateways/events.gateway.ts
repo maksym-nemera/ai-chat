@@ -23,7 +23,6 @@ export class EventsGateway {
   async sendAllMessages() {
     const messages = await this.messageService.getAllMessages();
     this.server.emit('allMessages', messages);
-    this.server.emit('loading', true);
 
     return;
   }
@@ -32,7 +31,6 @@ export class EventsGateway {
   async sendAllAnswers() {
     const answers = await this.answerService.getAllAnswers();
     this.server.emit('allAnswers', answers);
-    this.server.emit('loading', false);
 
     return;
   }
@@ -62,12 +60,16 @@ export class EventsGateway {
     Provide individualized advice and recommendations for success in Agile projects.
     `;
 
+    this.server.emit('isLoad', false);
+
     const generatedText = await this.openaiService.createCompletion(
       prompt,
       text,
     );
 
     this.server.emit('newAnswer', generatedText);
+
+    this.server.emit('isLoad', true);
 
     return { text: `AI received and saved: ${generatedText}` };
   }
