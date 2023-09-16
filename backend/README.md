@@ -71,6 +71,7 @@ DB_DATABASE=your-database
 ```
 
 - When you start the project, all tables in your database will be automatically created.
+- You can change init prompt in this path ```./backend/src/gateways/events.gateway.ts``` in handleAnswer function.
 
 ## <a id="features">Features:</a>
 
