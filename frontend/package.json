@@ -13,8 +13,7 @@
     "lint": "eslint . --ignore-path .gitignore",
     "style": "stylelint src/**/*.scss --ignore-path .gitignore",
     "format": "prettier --write . --ignore-path .gitignore --ignore-path .prettierignore",
-    "fix-style": "npm run format && npm run style && npm run lint -- --fix",
-    "prepare": "husky install"
+    "fix-style": "npm run format && npm run style && npm run lint -- --fix"
   },
   "lint-staged": {
     "*.{js,ts,css,scss,html,tsx,jsx}": "npm run format",

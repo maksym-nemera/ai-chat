@@ -84,6 +84,9 @@ The Client AI chat project is a web application developed to communicate with AI
 ## <a id="features">Features:</a>
 
 - Responsive design for optimal viewing on different devices.
+- Constant connection to the server using Socket IO
+<br>
+  ![ezgif com-video-to-gif](https://github.com/maksym-nemera/ai-chat/assets/81112084/7f131f95-3eee-4ad1-93ef-04fa16f62283)
 
 ## <a id="usage">Usage:</a>
 
@@ -95,7 +98,6 @@ Feel free to customize the content, styles, and functionality of the Client AI c
 - React-router
 - SocketIO
 - TypeScript
-- dotenv
 - MaterialUI
 
 ## <a id="contributing">Contributing:</a>

@@ -4,8 +4,9 @@ import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { actions as chatAction } from '../../features/chat/chatSlice';
 import { TextForm } from '../TextForm';
 import { Polygon } from '../icons/Polygon';
-import { Socket, io } from 'socket.io-client';
 import { combineAndSortMessagesAndAnswers } from '../../utils/utils';
+import { socket } from '../../utils/socket';
+import { MessegeAndAnswers } from '../../types/AnswerAndMessage';
 
 export const Chat: FC = memo(() => {
   const dispatch = useAppDispatch();
@@ -13,105 +14,61 @@ export const Chat: FC = memo(() => {
 
   const [message, setMessage] = useState('');
   const [isFocused, setIsFocused] = useState(false);
-  const [socket, setSocket] = useState<Socket | null>(null);
+  const [isConnected, setIsConnected] = useState(socket.connected);
 
   useEffect(() => {
-    const socketInstance = io('ws://localhost:80/', {
-      transports: ['websocket'],
-      reconnection: true,
-      reconnectionAttempts: Infinity,
-      reconnectionDelay: 1000,
-    });
-
-    socketInstance.on('connect', () => {
+    const onConnect = () => {
       // eslint-disable-next-line no-console
       console.log('Connected to the server');
-    });
+      setIsConnected(true);
+    };
 
-    socketInstance.on('error', (error) => {
-      // eslint-disable-next-line no-console
-      console.error('Socket error:', error);
-    });
-
-    socketInstance.on('disconnect', () => {
+    const onDisconnect = () => {
       // eslint-disable-next-line no-console
       console.log('Disconnected from the server');
-    });
-
-    setSocket(socketInstance);
-
-    // eslint-disable-next-line consistent-return
-    return () => {
-      socketInstance.disconnect();
+      setIsConnected(false);
     };
-  }, [loading]);
 
-  useEffect(() => {
-    if (!socket) return;
-
-    socket.emit('allMessages');
-    socket.on('allMessages', (messages) => {
+    const getAllMessages = (messages: MessegeAndAnswers[]) => {
       dispatch(chatAction.setMessages(messages));
-    });
+    };
 
-    socket.emit('allAnswers');
-    socket.on('allAnswers', (answers) => {
+    const getAllAnswers = (answers: MessegeAndAnswers[]) => {
       dispatch(chatAction.setAnswers(answers));
-    });
+    };
+
+    socket.on('connect', onConnect);
+    socket.on('disconnect', onDisconnect);
+    socket.emit('allMessages');
+    socket.on('allMessages', getAllMessages);
+    socket.emit('allAnswers');
+    socket.on('allAnswers', getAllAnswers);
 
     // eslint-disable-next-line consistent-return
     return () => {
-      socket.off('allMessages');
-      socket.off('allAnswers');
+      socket.off('connect', onConnect);
+      socket.off('disconnect', onDisconnect);
+      socket.off('allMessages', getAllMessages);
+      socket.off('allAnswers', getAllAnswers);
     };
-  }, [dispatch, socket, loading]);
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const checkAnswer = async () => {
-    if (!socket) return;
-    socket.emit('allAnswers');
-    socket.on('allAnswers', (answers) => {
-      dispatch(chatAction.setAnswers(answers));
-    });
-    socket.on('loading', (loading) => {
-      dispatch(chatAction.setLoading(loading));
-    });
-  };
-
-  useEffect(() => {
-    // eslint-disable-next-line no-magic-numbers
-    const intervalId = setInterval(checkAnswer, 5000);
-    return () => clearInterval(intervalId);
-  }, [checkAnswer, loading]);
+  }, [dispatch, isConnected, loading]);
 
   const isMobile = useMediaQuery('(max-width: 768px)');
 
   const handleSendMessage = () => {
     if (message.trim() === '') return;
 
-    if (!socket) return;
-
     dispatch(chatAction.setLoading(true));
 
-    Promise.all([
-      socket.emit('message', { text: message }),
-      socket.emit('answers', { text: message }),
-      socket.emit('allAnswers'),
-      socket.on('allAnswers', (answers) => {
-        dispatch(chatAction.setAnswers(answers));
-      }),
-      socket.emit('allMessages'),
-      socket.on('allMessages', (messages) => {
-        dispatch(chatAction.setMessages(messages));
-      }),
-      socket.on('loading', (loading) => {
-        dispatch(chatAction.setLoading(loading));
-      }),
-    ]);
+    socket.emit('message', { text: message });
+    // eslint-disable-next-line no-magic-numbers
+    socket.timeout(1).emit('answers', { text: message }, () => {
+      socket.on('isLoad', (isLoad) => {
+        dispatch(chatAction.setLoading(!isLoad));
+      });
+    });
 
     setMessage('');
-
-    dispatch(chatAction.setLoading(false));
   };
 
   const addMessage = (event: ChangeEvent<HTMLInputElement>) => {
