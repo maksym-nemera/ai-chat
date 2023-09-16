@@ -1,0 +1,17 @@
+{
+  "name": "agile_ai_coach_application",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "frontend:dev": "cd frontend && npm run start",
+    "backend:dev": "cd backend && npm run start:dev",
+    "all:dev": "concurrently \"npm run backend:dev\" \"npm run frontend:dev\""
+  },
+  "author": "Maksym Nemera",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.1"
+  }
+}
