@@ -110,35 +110,55 @@ export const Chat: FC = memo(() => {
           padding: isMobile ? '20px 15px 0 15px' : '20px 64px 0 64px',
           overflowY: 'scroll',
         }}>
-        {combinedArray.map(({ id, text, category }, index) => (
-          <Typography
-            key={id}
-            variant='h5'
-            sx={{
-              marginBottom:
-                index === combinedArray.length - 1 ? '190px' : '28px',
-              padding: isMobile ? '10px 20px 15px 20px' : '25px 43px 25px 44px',
-              borderRadius: '40px',
-              background: category === 'user' ? '#FEE2C5' : '#C4DDFF',
-              textAlign: category === 'user' ? 'end' : 'start',
-              lineHeight: 'normal',
-              alignSelf: category === 'user' ? 'flex-end' : 'flex-start',
-              position: 'relative',
-            }}>
-            <Polygon
-              style={{
-                position: 'absolute',
-                bottom: 0,
-                left: category === 'user' ? 'auto' : '-18px',
-                transform: category === 'user' ? 'none' : 'scaleX(-1)',
-                right: category === 'user' ? '-18px' : 'auto',
-              }}
-              fill={category === 'user' ? '#FEE2C5' : '#C4DDFF'}
-            />
+        {combinedArray.map(({ id, text, category, createdAt }, index) => {
+          const date = new Date(createdAt);
+          const hours = date.getHours();
+          const minutes = date.getMinutes();
+          const formattedTime = `${hours}:${minutes}`;
 
-            {text}
-          </Typography>
-        ))}
+          return (
+            <Typography
+              key={id}
+              variant='h5'
+              sx={{
+                marginBottom:
+                  index === combinedArray.length - 1 ? '190px' : '28px',
+                padding: isMobile
+                  ? '10px 20px 15px 20px'
+                  : '25px 43px 25px 44px',
+                borderRadius: '40px',
+                background: category === 'user' ? '#FEE2C5' : '#C4DDFF',
+                textAlign: category === 'user' ? 'end' : 'start',
+                lineHeight: 'normal',
+                alignSelf: category === 'user' ? 'flex-end' : 'flex-start',
+                position: 'relative',
+              }}>
+              <Polygon
+                style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: category === 'user' ? 'auto' : '-18px',
+                  transform: category === 'user' ? 'none' : 'scaleX(-1)',
+                  right: category === 'user' ? '-18px' : 'auto',
+                }}
+                fill={category === 'user' ? '#FEE2C5' : '#C4DDFF'}
+              />
+              {text}
+
+              <Box
+                sx={{
+                  position: 'relative',
+                  top: '10px',
+                  display: 'flex',
+                  justifyContent:
+                    category === 'user' ? 'flex-start' : 'flex-end',
+                  color: '#ACADAD',
+                }}>
+                {formattedTime}
+              </Box>
+            </Typography>
+          );
+        })}
       </Box>
 
       <TextForm
