@@ -1,13 +1,14 @@
 {
-  "name": "agile_ai_coach_application",
+  "name": "ai-chat",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "frontend:dev": "cd frontend && npm run start",
     "backend:dev": "cd backend && npm run start:dev",
-    "all:dev": "concurrently \"npm run backend:dev\" \"npm run frontend:dev\""
+    "all:dev": "concurrently \"npm run backend:dev\" \"npm run frontend:dev\"",
+    "frontend:install": "cd frontend && npm install",
+    "backend:install": "cd backend && npm install"
   },
   "author": "Maksym Nemera",
   "license": "ISC",
